@@ -3,7 +3,7 @@
             class="la la-home nav-icon"></i> {{ trans('backpack::base.dashboard') }}</a></li>
 
 
-@if(backpack_user()->role=="staff")
+@if(backpack_user()->role=="staff" || backpack_user()->role=="admin")
     <li class="nav-item nav-dropdown">
         <a class="nav-link nav-dropdown-toggle" href="#"><i class="nav-icon la la-group"></i> Người dùng</a>
         <ul class="nav-dropdown-items">

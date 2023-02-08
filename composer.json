@@ -12,7 +12,8 @@
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/socialite": "^5.6",
-        "laravel/tinker": "^2.7"
+        "laravel/tinker": "^2.7",
+        "orangehill/iseed": "^3.0"
     },
     "require-dev": {
         "backpack/generators": "^3.3",
