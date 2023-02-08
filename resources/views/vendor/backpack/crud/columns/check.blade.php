@@ -2,8 +2,8 @@
 @php
     $checkValue = data_get($entry, $column['name']);
 
-    $checkedIcon = data_get($column, 'icons.checked', 'la-check-circle');
-    $uncheckedIcon = data_get($column, 'icons.unchecked', 'la-circle');
+    $checkedIcon = data_get($column, 'icons.checked', 'la-check-circle text-success');
+    $uncheckedIcon = data_get($column, 'icons.unchecked', 'la-circle text-dark');
 
     $exportCheckedText = data_get($column, 'labels.checked', trans('backpack::crud.yes'));
     $exportUncheckedText = data_get($column, 'labels.unchecked', trans('backpack::crud.no'));
@@ -20,8 +20,9 @@
 
 <span>
     @includeWhen(!empty($column['wrapper']), 'crud::columns.inc.wrapper_start')
-    <span class="d-flex justify-content-center">
+    <span class="justify-content-center">
         <i class="la {{ $icon }}"></i>
+        {{$column['text']??"Đã chọn"}}
     </span>
     @includeWhen(!empty($column['wrapper']), 'crud::columns.inc.wrapper_end')
 </span>

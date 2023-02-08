@@ -24,6 +24,9 @@ class Post extends Model
     // protected $fillable = [];
     // protected $hidden = [];
     // protected $dates = [];
+    protected $casts = [
+        'roles' => 'json'
+    ];
 
     /*
     |--------------------------------------------------------------------------
