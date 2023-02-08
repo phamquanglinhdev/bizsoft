@@ -229,7 +229,7 @@
                 <h2 class="text-uppercase">Sử dụng DEMO của chúng tôi để trải nghiệm các tính năng cơ bản</h2>
                 <p>Trải nghiệm bản demo trên window để biết được các tính năng cơ bản. Liên hệ trực tiếp dễ dàng tùy
                     chỉnh các chức năng cho phần mềm của chính bạn.</p>
-                <a href="#contact" class="btn btn-primary text-uppercase"><i class="fa fa-download"></i> Download</a>
+                <a href="{{backpack_url('/dashboard')}}" class="btn btn-primary text-uppercase"><i class="fa fa-download"></i> Download</a>
                 <a href="#contact" class="btn btn-primary text-uppercase"><i class="fa fa-inbox"></i> Liên hệ</a>
             </div>
         </div>
