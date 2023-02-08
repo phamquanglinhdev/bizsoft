@@ -48,6 +48,16 @@ class GradeCrudController extends CrudController
      */
     protected function setupListOperation()
     {
+        if (backpack_user()->role != "admin") {
+            $pivotTable = backpack_user()->role . "_grade";
+            $pivotForeignId = backpack_user()->role . "_id";
+            $pivotLocal = $pivotTable . ".grade_id";
+            $pivotForeign = "$pivotTable.$pivotForeignId";
+            $this->crud->query->join($pivotTable, $pivotLocal, "grades.id")
+                ->where("$pivotForeign", backpack_user()->id)
+                ->get();
+        }
+
         if (session("success")) {
             Alert::success(session("success"));
         }

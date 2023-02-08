@@ -41,6 +41,13 @@ class LogCrudController extends CrudController
      */
     protected function setupListOperation()
     {
+        if (backpack_user()->role != "admin") {
+            $role = backpack_user()->role;
+            $this->crud->query
+                ->join("grades", "logs.grade_id", "grades.id")
+                ->join($role . "_grade", $role . "_grade.grade_id", "grades.id")
+                ->where($role . "_grade." . $role . "_id", backpack_user()->id);
+        }
         CRUD::column('grade')->label("Lớp học")->wrapper([
             'href' => function ($crud, $column, $entry, $related_key) {
                 return backpack_url('grade/' . $related_key . '/show');
@@ -48,6 +55,16 @@ class LogCrudController extends CrudController
         ]);
         CRUD::column('lesson')->label("Bài học");
         CRUD::column('teacher')->label("Giáo viên");
+        CRUD::addColumn([
+            'label' => trans("backpack::crud.student_name"),
+            'type' => 'model_function',
+            'function_name' => 'Students'
+        ]);
+        CRUD::addColumn([
+            'label' => trans("backpack::crud.teacher_name"),
+            'type' => 'model_function',
+            'function_name' => 'Teachers'
+        ]);
         CRUD::column('date')->label("Ngày")->type("date");
         CRUD::column('start')->label("Bắt đầu")->type("time");
         CRUD::column('end')->label("Kết thúc")->type("time");
@@ -69,20 +86,6 @@ class LogCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        $this->crud->addFilter([
-            'name' => 'status',
-            'type' => 'select2',
-            'label' => 'Status'
-        ], function () {
-            return [
-                1 => 'In stock',
-                2 => 'In provider stock',
-                3 => 'Available upon ordering',
-                4 => 'Not available',
-            ];
-        }, function ($value) { // if the filter is active
-            // $this->crud->addClause('where', 'status', $value);
-        });
         CRUD::setValidation(LogRequest::class);
         if (isset($_REQUEST["grade_id"])) {
             CRUD::field('grade_id')->value($_REQUEST["grade_id"])->type("hidden");
@@ -112,14 +115,30 @@ class LogCrudController extends CrudController
             CRUD::field('teacher_comment')->label("Giáo viên nhận xét về buổi học");
             CRUD::field('question')->label("Bài tập của giáo viên");
         } else {
-            CRUD::addField([
-                'name' => 'grade_id',
-                'type' => 'select2',
-                'label' => 'Chọn lớp để điểm danh',
-                'wrapper' => [
-                    'onchange' => "changeGrade($('select[name=grade_id]').val())"
-                ]
-            ]);
+            if (backpack_user()->role != "admin") {
+                CRUD::addField([
+                    'name' => 'grade_id',
+                    'type' => 'select2',
+                    'label' => 'Chọn lớp để điểm danh',
+                    'wrapper' => [
+                        'onchange' => "changeGrade($('select[name=grade_id]').val())"
+                    ],
+                    'options' => (function ($query) {
+                        return $query->join("staff_grade", "staff_grade.grade_id", 'grades.id')
+                            ->where("staff_grade.staff_id", backpack_user()->id)
+                            ->get();
+                    }),
+                ]);
+            } else {
+                CRUD::addField([
+                    'name' => 'grade_id',
+                    'type' => 'select2',
+                    'label' => 'Chọn lớp để điểm danh',
+                    'wrapper' => [
+                        'onchange' => "changeGrade($('select[name=grade_id]').val())"
+                    ],
+                ]);
+            }
         }
         Widget::add()->type('script')->content(asset("js/grades.js"));
 

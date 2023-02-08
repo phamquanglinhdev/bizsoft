@@ -49,6 +49,25 @@ class Log extends Model
     {
         return $this->belongsTo(Teacher::class, "teacher_id", "id");
     }
+
+    public function Students(): string
+    {
+        $result = [];
+        $students = $this->Grade()->first()->Students()->get(['name']);
+        foreach ($students as $item) {
+            $result[] = $item->name;
+        }
+        return implode(",", $result);
+    }
+    public function Teachers(): string
+    {
+        $result = [];
+        $teachers = $this->Grade()->first()->Teachers()->get(['name']);
+        foreach ($teachers as $item) {
+            $result[] = $item->name;
+        }
+        return implode(", ", $result);
+    }
     /*
     |--------------------------------------------------------------------------
     | SCOPES
