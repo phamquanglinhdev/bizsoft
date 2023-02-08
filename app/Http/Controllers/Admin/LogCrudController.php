@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\LogRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Backpack\CRUD\app\Library\Widget;
 use Carbon\Carbon;
 
 /**
@@ -68,42 +69,59 @@ class LogCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
+        $this->crud->addFilter([
+            'name' => 'status',
+            'type' => 'select2',
+            'label' => 'Status'
+        ], function () {
+            return [
+                1 => 'In stock',
+                2 => 'In provider stock',
+                3 => 'Available upon ordering',
+                4 => 'Not available',
+            ];
+        }, function ($value) { // if the filter is active
+            // $this->crud->addClause('where', 'status', $value);
+        });
         CRUD::setValidation(LogRequest::class);
-        if (backpack_user()->role != "teacher") {
-            if (isset($_REQUEST["grade_id"])) {
+        if (isset($_REQUEST["grade_id"])) {
+            CRUD::field('grade_id')->value($_REQUEST["grade_id"])->type("hidden");
+            if (backpack_user()->role != "teacher") {
                 CRUD::addField([
                     'label' => 'Giáo viên',
                     'name' => 'teacher_id',
                     'type' => 'select2',
                     'entity' => 'Teacher',
-                    'attribute' => 'name'
+                    'attribute' => 'name',
+                    'options' => (function ($query) {
+                        return $query->join("teacher_grade", "teacher_grade.teacher_id", "users.id")
+                            ->where("teacher_grade.grade_id", $_REQUEST["grade_id"])
+                            ->where('users.role', "teacher")
+                            ->get();
+                    }),
                 ]);
             } else {
-                CRUD::addField([
-                    'label' => 'Giáo viên',
-                    'name' => 'teacher_id',
-                    'type' => 'select2',
-                    'entity' => 'Teacher',
-                    'attribute' => 'name'
-                ]);
+                CRUD::field('teacher_id')->value(backpack_user()->id);
             }
+            CRUD::field('lesson')->label("Bài học");
+            CRUD::field('date')->label("Ngày")->wrapper(["class" => "col-md-4 mb-2"])->default(Carbon::now());
+            CRUD::field('start')->label("Bắt đầu")->wrapper(["class" => "col-md-4 mb-2"]);
+            CRUD::field('end')->label("Kết thuc")->wrapper(["class" => "col-md-4 mb-2"]);;
+            CRUD::field('salary_per_hour')->type("number")->label("Lương theo giờ")->wrapper(["class" => "col-md-6 mb-2"])->suffix(" đ");;
+            CRUD::field('video')->type("video")->label("Video bài học")->wrapper(["class" => "col-md-6 mb-2"]);
+            CRUD::field('teacher_comment')->label("Giáo viên nhận xét về buổi học");
+            CRUD::field('question')->label("Bài tập của giáo viên");
         } else {
-            CRUD::field('teacher_id')->value(backpack_user()->id);
+            CRUD::addField([
+                'name' => 'grade_id',
+                'type' => 'select2',
+                'label' => 'Chọn lớp để điểm danh',
+                'wrapper' => [
+                    'onchange' => "changeGrade($('select[name=grade_id]').val())"
+                ]
+            ]);
         }
-        if (isset($_REQUEST["grade_id"])) {
-            CRUD::field('grade_id')->value($_REQUEST["grade_id"])->label("Lớp");
-        } else {
-            CRUD::field('grade_id')->label("Lớp");
-        }
-        CRUD::field('lesson')->label("Bài học");
-        CRUD::field('date')->label("Ngày")->wrapper(["class" => "col-md-4 mb-2"])->default(Carbon::now());
-        CRUD::field('start')->label("Bắt đầu")->wrapper(["class" => "col-md-4 mb-2"]);
-        CRUD::field('end')->label("Kết thuc")->wrapper(["class" => "col-md-4 mb-2"]);;
-        CRUD::field('salary_per_hour')->type("number")->label("Lương theo giờ")->wrapper(["class"=>"col-md-6 mb-2"])->suffix(" đ");;
-        CRUD::field('video')->type("video")->label("Video bài học")->wrapper(["class"=>"col-md-6 mb-2"]);
-        CRUD::field('teacher_comment')->label("Giáo viên nhận xét về buổi học");
-        CRUD::field('question')->label("Bài tập của giáo viên");
-
+        Widget::add()->type('script')->content(asset("js/grades.js"));
 
 
         /**

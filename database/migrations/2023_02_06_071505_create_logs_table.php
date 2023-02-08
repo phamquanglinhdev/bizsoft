@@ -14,7 +14,7 @@ return new class extends Migration {
     {
         Schema::create('logs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("grade_id");
+            $table->unsignedBigInteger("grade_id")->nullable();
             $table->string("lesson");
             $table->date("date");
             $table->time("start");
