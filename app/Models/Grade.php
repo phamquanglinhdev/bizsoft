@@ -59,6 +59,11 @@ class Grade extends Model
     {
         return $this->hasMany(Log::class, "grade_id", "id");
     }
+
+    public function Staffs()
+    {
+        return $this->belongsToMany(Staff::class, "staff_grade", "grade_id", "staff_id");
+    }
     /*
     |--------------------------------------------------------------------------
     | SCOPES

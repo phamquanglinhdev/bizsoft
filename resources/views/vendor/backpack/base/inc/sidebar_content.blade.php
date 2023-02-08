@@ -3,13 +3,15 @@
             class="la la-home nav-icon"></i> {{ trans('backpack::base.dashboard') }}</a></li>
 
 
-@if(backpack_user()->role=="admin")
+@if(backpack_user()->role=="staff")
     <li class="nav-item nav-dropdown">
         <a class="nav-link nav-dropdown-toggle" href="#"><i class="nav-icon la la-group"></i> Người dùng</a>
         <ul class="nav-dropdown-items">
-            <li class="nav-item"><a class="nav-link" href="{{ backpack_url('staff') }}"><i
-                        class="nav-icon la la-user-astronaut"></i> Nhân
-                    viên</a></li>
+            @if(backpack_user()->role=="admin")
+                <li class="nav-item"><a class="nav-link" href="{{ backpack_url('staff') }}"><i
+                            class="nav-icon la la-user-astronaut"></i> Nhân
+                        viên</a></li>
+            @endif
             <li class="nav-item"><a class="nav-link" href="{{ backpack_url('teacher') }}"><i
                         class="nav-icon la la-user-tie"></i>
                     Giáo viên</a></li>
@@ -19,12 +21,18 @@
             {{--        <li class="nav-item"><a class="nav-link" href="{{ backpack_url('user') }}"><i class="nav-icon la la-question"></i> Users</a>--}}
             {{--        </li>--}}
         </ul>
-    <li class="nav-item"><a class="nav-link" href="{{ backpack_url('grade') }}"><i
-                class="nav-icon la la-chalkboard"></i> Lớp học</a></li>
-    </li>
+    @if(backpack_user()->role=="admin")
+        <li class="nav-item"><a class="nav-link" href="{{ backpack_url('post') }}"><i
+                    class="nav-icon la la-pinterest"></i>
+                Bài viết</a>
+        </li>
+    @endif
 @endif
 
+<li class="nav-item"><a class="nav-link" href="{{ backpack_url('grade') }}"><i
+            class="nav-icon la la-chalkboard"></i> Lớp học</a></li>
+</li>
+<li class="nav-item"><a class="nav-link" href="{{ backpack_url('log') }}"><i class="nav-icon la la-history"></i> Nhật ký</a>
+</li>
 
-<li class="nav-item"><a class="nav-link" href="{{ backpack_url('log') }}"><i class="nav-icon la la-history"></i> Nhật ký</a></li>
 
-<li class="nav-item"><a class="nav-link" href="{{ backpack_url('post') }}"><i class="nav-icon la la-question"></i> Posts</a></li>
