@@ -7,6 +7,7 @@ use App\Models\Grade;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Backpack\CRUD\app\Library\Widget;
+use Illuminate\Support\Facades\DB;
 use Prologue\Alerts\Facades\Alert;
 
 /**
@@ -17,8 +18,13 @@ use Prologue\Alerts\Facades\Alert;
 class GradeCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation {
+        store as traitStore;
+    }
+    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation {
+        update as traitUpdate;
+    }
+
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
@@ -55,6 +61,18 @@ class GradeCrudController extends CrudController
             'name' => 'thumbnail',
             'label' => 'Ảnh minh họa',
             'type' => 'image',
+        ]);
+        CRUD::addColumn([
+            'name' => 'staffs',
+            'label' => 'Nhân viên quản lý',
+        ]);
+        CRUD::addColumn([
+            'name' => 'teachers',
+            'label' => 'Giáo viên',
+        ]);
+        CRUD::addColumn([
+            'name' => 'students',
+            'label' => 'Học sinh',
         ]);
         CRUD::addColumn([
             'name' => 'pricing',
@@ -106,6 +124,44 @@ class GradeCrudController extends CrudController
             'type' => 'image',
             'crop' => true,
             'aspect_ratio' => 1,
+        ]);
+        if (backpack_user()->role == "admin") {
+            CRUD::addField([
+                'name' => 'staffs',
+                'label' => 'Nhân viên',
+                'type' => 'relationship',
+                'model' => 'App\Models\Staff',
+                'entity' => 'Staffs',
+                'attribute' => 'name',
+                'pivot' => true,
+                'options' => (function ($query) {
+                    return $query->orderBy('name', 'ASC')->where('role', "staff")->get();
+                }),
+            ]);
+        }
+        CRUD::addField([
+            'name' => 'teachers',
+            'label' => 'Giáo viên',
+            'type' => 'relationship',
+            'model' => 'App\Models\Teacher',
+            'entity' => 'Teachers',
+            'attribute' => 'name',
+            'pivot' => true,
+            'options' => (function ($query) {
+                return $query->orderBy('name', 'ASC')->where('role', "teacher")->get();
+            }),
+        ]);
+        CRUD::addField([
+            'name' => 'students',
+            'label' => 'Học sinh',
+            'type' => 'relationship',
+            'model' => 'App\Models\Student',
+            'entity' => 'Students',
+            'attribute' => 'name',
+            'pivot' => true,
+            'options' => (function ($query) {
+                return $query->orderBy('name', 'ASC')->where('role', "student")->get();
+            }),
         ]);
         CRUD::addField([
             'name' => 'link',
@@ -275,4 +331,16 @@ class GradeCrudController extends CrudController
         return redirect(backpack_url("/grade/"))->with("success", "Xóa thành công !");
     }
 
+    public function store()
+    {
+        $response = $this->traitStore();
+        if (backpack_user()->role == "staff") {
+            $id = Grade::orderBy("id", "DESC")->first()->id;
+            DB::table("staff_grade")->insert([
+                'grade_id' => $id,
+                'staff_id' => backpack_user()->id
+            ]);
+        }
+        return $response;
+    }
 }
