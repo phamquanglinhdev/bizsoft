@@ -244,8 +244,7 @@
             <div class="row">
                 <div class="col-md-6 wow fadeInUp" data-wow-delay="0.6s">
                     <h2 class="text-uppercase">Liên hệ với chúng tôi</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation. </p>
+                    <p class="text-uppercase h3 font-weight-bold">Công Ty TNHH BIZ </p>
                     <address>
                         <p><i class="fa fa-map-marker"></i>Số 9, ngõ 908/36 Kim Giang, thành phố Hà Nội.</p>
                         <p><i class="fa fa-phone"></i> 0977 281 661 </p>

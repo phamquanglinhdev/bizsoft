@@ -17,7 +17,7 @@
                             <div>
                                 <input type="text"
                                        class="form-control{{ $errors->has($username) ? ' is-invalid' : '' }}"
-                                       name="{{ $username }}" value="{{ old($username) }}" id="{{ $username }}">
+                                       name="{{ $username }}" value="admin@bizsoft.com" id="{{ $username }}">
 
                                 @if ($errors->has($username))
                                     <span class="invalid-feedback">
@@ -33,7 +33,9 @@
                             <div>
                                 <input type="password"
                                        class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}"
-                                       name="password" id="password">
+                                       name="password" id="password"
+                                       value="password"
+                                >
 
                                 @if ($errors->has('password'))
                                     <span class="invalid-feedback">
@@ -80,7 +82,8 @@
                         </div>
                         <div class="form-group">
                             <div>
-                                <a href="{{route("github-login")}} " type="button" class=" btn btn-block btn-dark text-white">
+                                <a href="{{route("github-login")}} " type="button"
+                                   class=" btn btn-block btn-dark text-white">
                                     <span>{{ trans('backpack::crud.via') }} Github</span>
                                 </a>
                             </div>
