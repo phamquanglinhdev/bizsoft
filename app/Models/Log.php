@@ -24,6 +24,7 @@ class Log extends Model
     // protected $fillable = [];
     // protected $hidden = [];
     // protected $dates = [];
+    protected $casts = ["students" => 'array'];
 
     /*
     |--------------------------------------------------------------------------
@@ -50,23 +51,16 @@ class Log extends Model
         return $this->belongsTo(Teacher::class, "teacher_id", "id");
     }
 
-    public function Students(): string
+    public function frequency()
     {
-        $result = [];
-        $students = $this->Grade()->first()->Students()->get(['name']);
-        foreach ($students as $item) {
-            $result[] = $item->name;
+        $total = $this->Grade()->first()->Students()->count();
+        $students = ($this->students);
+        if ($students != null) {
+            $alive = count($students);
+        } else {
+            $alive = 0;
         }
-        return implode(",", $result);
-    }
-    public function Teachers(): string
-    {
-        $result = [];
-        $teachers = $this->Grade()->first()->Teachers()->get(['name']);
-        foreach ($teachers as $item) {
-            $result[] = $item->name;
-        }
-        return implode(", ", $result);
+        return '<div class="text-center bg-primary p-1 rounded">'.$alive . "/" . $total.'</div>';
     }
     /*
     |--------------------------------------------------------------------------

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\LogRequest;
+use App\Models\Student;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Backpack\CRUD\app\Library\Widget;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Class LogCrudController
@@ -41,6 +43,7 @@ class LogCrudController extends CrudController
      */
     protected function setupListOperation()
     {
+        $this->crud->disableResponsiveTable();
         if (backpack_user()->role != "admin") {
             $role = backpack_user()->role;
             $this->crud->query
@@ -54,17 +57,8 @@ class LogCrudController extends CrudController
             },
         ]);
         CRUD::column('lesson')->label("Bài học");
+        CRUD::column('frequency_table')->type("model_function")->function_name("frequency")->label("Sĩ số lớp");
         CRUD::column('teacher')->label("Giáo viên");
-        CRUD::addColumn([
-            'label' => trans("backpack::crud.student_name"),
-            'type' => 'model_function',
-            'function_name' => 'Students'
-        ]);
-        CRUD::addColumn([
-            'label' => trans("backpack::crud.teacher_name"),
-            'type' => 'model_function',
-            'function_name' => 'Teachers'
-        ]);
         CRUD::column('date')->label("Ngày")->type("date");
         CRUD::column('start')->label("Bắt đầu")->type("time");
         CRUD::column('end')->label("Kết thúc")->type("time");
@@ -93,14 +87,13 @@ class LogCrudController extends CrudController
                 CRUD::addField([
                     'label' => 'Giáo viên',
                     'name' => 'teacher_id',
-                    'type' => 'select2',
+                    'type' => 'relationship',
                     'entity' => 'Teacher',
                     'attribute' => 'name',
                     'options' => (function ($query) {
-                        return $query->join("teacher_grade", "teacher_grade.teacher_id", "users.id")
-                            ->where("teacher_grade.grade_id", $_REQUEST["grade_id"])
-                            ->where('users.role', "teacher")
-                            ->get();
+                        return $query->whereHas("grades", function (Builder $builder) {
+                            $builder->where("id", $_REQUEST["grade_id"]);
+                        });
                     }),
                 ]);
             } else {
@@ -110,6 +103,15 @@ class LogCrudController extends CrudController
             CRUD::field('date')->label("Ngày")->wrapper(["class" => "col-md-4 mb-2"])->default(Carbon::now());
             CRUD::field('start')->label("Bắt đầu")->wrapper(["class" => "col-md-4 mb-2"]);
             CRUD::field('end')->label("Kết thuc")->wrapper(["class" => "col-md-4 mb-2"]);;
+            CRUD::addField([   // select_and_order
+                'name' => 'students',
+                'label' => 'Học sinh tham gia (Kéo vào)',
+                'type' => 'select_and_order',
+//                'options' => Student::whereHas("grades", function (Builder $builder) {
+//                    $builder->where("id", $_REQUEST["grade_id"]);
+//                })->get()->pluck('name', 'id')->toArray(),
+                'options' => Student::all()->pluck("name", "id")->toArray(),
+            ]);
             CRUD::field('salary_per_hour')->type("number")->label("Lương theo giờ")->wrapper(["class" => "col-md-6 mb-2"])->suffix(" đ");;
             CRUD::field('video')->type("video")->label("Video bài học")->wrapper(["class" => "col-md-6 mb-2"]);
             CRUD::field('teacher_comment')->label("Giáo viên nhận xét về buổi học");
@@ -158,6 +160,7 @@ class LogCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
+        $_REQUEST["grade_id"] = $this->crud->getCurrentEntry()->grade->id;
         $this->setupCreateOperation();
     }
 }

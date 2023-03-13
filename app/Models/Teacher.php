@@ -16,6 +16,6 @@ class Teacher extends User
 
     public function Grades()
     {
-        return $this->belongsToMany(Grade::class, "staff_grade", "staff_id", "grade_id");
+        return $this->belongsToMany(Grade::class, "teacher_grade", "teacher_id", "grade_id");
     }
 }
