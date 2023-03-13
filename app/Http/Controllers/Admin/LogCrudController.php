@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\LogRequest;
+use App\Models\Grade;
 use App\Models\Student;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
@@ -82,42 +83,51 @@ class LogCrudController extends CrudController
     {
         CRUD::setValidation(LogRequest::class);
         if (isset($_REQUEST["grade_id"])) {
-            CRUD::field('grade_id')->value($_REQUEST["grade_id"])->type("hidden");
-            if (backpack_user()->role != "teacher") {
+            $grade = Grade::where("id", $_REQUEST["grade_id"])->first();
+            if (!isset($grade->id)) {
                 CRUD::addField([
-                    'label' => 'Giáo viên',
-                    'name' => 'teacher_id',
-                    'type' => 'relationship',
-                    'entity' => 'Teacher',
-                    'attribute' => 'name',
-                    'options' => (function ($query) {
-                        return $query->whereHas("grades", function (Builder $builder) {
-                            $builder->where("id", $_REQUEST["grade_id"]);
-                        });
-                    }),
+                    'name' => 'grade_id',
+                    'type' => 'select2',
+                    'label' => 'Chọn lớp để điểm danh',
+                    'wrapper' => [
+                        'onchange' => "changeGrade($('select[name=grade_id]').val())"
+                    ],
                 ]);
             } else {
-                CRUD::field('teacher_id')->value(backpack_user()->id);
+                CRUD::field('grade_id')->value($_REQUEST["grade_id"])->type("hidden");
+                if (backpack_user()->role != "teacher") {
+                    CRUD::addField([
+                        'label' => 'Giáo viên',
+                        'name' => 'teacher_id',
+                        'type' => 'relationship',
+                        'entity' => 'Teacher',
+                        'attribute' => 'name',
+                        'options' => (function ($query) {
+                            return $query->whereHas("grades", function (Builder $builder) {
+                                $builder->where("id", $_REQUEST["grade_id"]);
+                            });
+                        }),
+                    ]);
+                } else {
+                    CRUD::field('teacher_id')->value(backpack_user()->id);
+                }
+                CRUD::field('lesson')->label("Bài học");
+                CRUD::field('date')->label("Ngày")->wrapper(["class" => "col-md-4 mb-2"])->default(Carbon::now());
+                CRUD::field('start')->label("Bắt đầu")->wrapper(["class" => "col-md-4 mb-2"]);
+                CRUD::field('end')->label("Kết thuc")->wrapper(["class" => "col-md-4 mb-2"]);;
+                CRUD::addField([   // select_and_order
+                    'name' => 'students',
+                    'label' => 'Học sinh tham gia (Kéo vào)',
+                    'type' => 'select_and_order',
+                    'options' => Student::whereHas("grades", function (Builder $builder) use ($grade) {
+                        $builder->where("id", $grade->id);
+                    })->get()->pluck("name")->toArray(),
+                ]);
+                CRUD::field('salary_per_hour')->type("number")->label("Lương theo giờ")->wrapper(["class" => "col-md-6 mb-2"])->suffix(" đ");;
+                CRUD::field('video')->type("video")->label("Video bài học")->wrapper(["class" => "col-md-6 mb-2"]);
+                CRUD::field('teacher_comment')->label("Giáo viên nhận xét về buổi học");
+                CRUD::field('question')->label("Bài tập của giáo viên");
             }
-            CRUD::field('lesson')->label("Bài học");
-            CRUD::field('date')->label("Ngày")->wrapper(["class" => "col-md-4 mb-2"])->default(Carbon::now());
-            CRUD::field('start')->label("Bắt đầu")->wrapper(["class" => "col-md-4 mb-2"]);
-            CRUD::field('end')->label("Kết thuc")->wrapper(["class" => "col-md-4 mb-2"]);;
-            CRUD::addField([   // select_and_order
-                'name' => 'students',
-                'label' => 'Học sinh tham gia (Kéo vào)',
-                'type' => 'select_and_order',
-//                'options' => Student::whereHas("grades", function (Builder $builder) {
-//                    $builder->where("id", $_REQUEST["grade_id"]);
-//                })->get()->pluck('name', 'id')->toArray(),
-                'options' => Student::whereHas("grades", function (Builder $builder) {
-                    $builder->where("id", $_REQUEST["grade_id"]);
-                })->get()->pluck("name", "id")->toArray(),
-            ]);
-            CRUD::field('salary_per_hour')->type("number")->label("Lương theo giờ")->wrapper(["class" => "col-md-6 mb-2"])->suffix(" đ");;
-            CRUD::field('video')->type("video")->label("Video bài học")->wrapper(["class" => "col-md-6 mb-2"]);
-            CRUD::field('teacher_comment')->label("Giáo viên nhận xét về buổi học");
-            CRUD::field('question')->label("Bài tập của giáo viên");
         } else {
             if (backpack_user()->role != "admin") {
                 CRUD::addField([

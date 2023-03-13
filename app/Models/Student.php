@@ -24,6 +24,6 @@ class Student extends User
     public
     function Grades()
     {
-        $this->belongsToMany(Grade::class, "student_grade", "student_id", "grade_id");
+        return $this->belongsToMany(Grade::class, "student_grade", "student_id", "grade_id");
     }
 }
