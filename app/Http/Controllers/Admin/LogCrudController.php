@@ -110,7 +110,9 @@ class LogCrudController extends CrudController
 //                'options' => Student::whereHas("grades", function (Builder $builder) {
 //                    $builder->where("id", $_REQUEST["grade_id"]);
 //                })->get()->pluck('name', 'id')->toArray(),
-                'options' => Student::all()->pluck("name", "id")->toArray(),
+                'options' => Student::whereHas("grades", function (Builder $builder) {
+                    $builder->where("id", $_REQUEST["grade_id"]);
+                })->pluck("name", "id")->toArray(),
             ]);
             CRUD::field('salary_per_hour')->type("number")->label("Lương theo giờ")->wrapper(["class" => "col-md-6 mb-2"])->suffix(" đ");;
             CRUD::field('video')->type("video")->label("Video bài học")->wrapper(["class" => "col-md-6 mb-2"]);
