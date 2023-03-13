@@ -20,6 +20,8 @@
                     Học sinh</a></li>
             {{--        <li class="nav-item"><a class="nav-link" href="{{ backpack_url('user') }}"><i class="nav-icon la la-question"></i> Users</a>--}}
             {{--        </li>--}}
+            <li class="nav-item"><a class="nav-link" href="{{ backpack_url('customer') }}"><i
+                        class="nav-icon la la-users"></i> Khách hàng</a></li>
         </ul>
     @if(backpack_user()->role=="admin")
         <li class="nav-item"><a class="nav-link" href="{{ backpack_url('post') }}"><i
@@ -36,5 +38,5 @@
 </li>
 
 
-
-<li class='nav-item'><a class='nav-link' href='{{ backpack_url('backup') }}'><i class='nav-icon la la-hdd-o'></i> Backups</a></li>
+<li class='nav-item'><a class='nav-link' href='{{ backpack_url('backup') }}'><i class='nav-icon la la-hdd-o'></i>
+        Backups</a></li>
