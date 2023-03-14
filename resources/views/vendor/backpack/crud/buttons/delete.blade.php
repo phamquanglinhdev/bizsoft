@@ -2,7 +2,7 @@
     <a href="javascript:void(0)" onclick="deleteEntry(this)"><i class="la la-trash"></i>
         {{trans('backpack::crud.delete')}}
     </a>
-    <form id="delete-{{$entry->getKey()}}" action="{{backpack_url("grade/$entry->id")}}" method="post">
+    <form id="delete-{{$entry->getKey()}}" action="{{url($crud->route."/".$entry->id)}}" method="post">
         @csrf
         @method("delete")
     </form>

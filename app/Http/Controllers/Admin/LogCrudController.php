@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\LogRequest;
 use App\Models\Grade;
+use App\Models\Log;
 use App\Models\Student;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
@@ -174,5 +175,11 @@ class LogCrudController extends CrudController
     {
         $_REQUEST["grade_id"] = $this->crud->getCurrentEntry()->grade->id;
         $this->setupCreateOperation();
+    }
+
+    protected function destroy($id)
+    {
+        Log::find($id)->update(["disable" => 1]);
+        return redirect()->back()->with("success", "Xóa thành công !");
     }
 }

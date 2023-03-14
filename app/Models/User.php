@@ -45,10 +45,11 @@ class User extends Authenticatable
 
     public function delete()
     {
-        return $this->update([
+        $this->update([
             'disable' => 1,
             'email' => "deleteUser" . Str::random(20) . "@delete.com"
         ]);
+        return redirect()->back();
     }
 
     public function setPasswordAttribute($value)
