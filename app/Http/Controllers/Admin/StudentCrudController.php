@@ -58,7 +58,14 @@ class StudentCrudController extends UserCrudController
     protected function setupCreateOperation()
     {
         parent::setupCreateOperation();
-
+        CRUD::addField([
+            'name' => 'grades',
+            'entity' => 'Grades',
+            'model' => 'App\Models\Grade',
+            'type' => 'relationship',
+            'attribute' => 'name',
+            'label' => 'Lớp'
+        ]);
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
