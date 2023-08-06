@@ -19,18 +19,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-//        DB::table("classrooms")->truncate();
-//        User::query()->create([
-//            "name" => "Administrator",
-//            "avatar" => "https://i.pinimg.com/736x/4d/47/59/4d4759f61e13927c5f5b39a4cc66af70.jpg",
-//            "email" => 'bizsoft@live.com',
-//            "password" => Hash::make("12345"),
-//            "phone" => "+840904800240",
-//            "birthday" => Carbon::create("2002", "1", "7"),
-//            "role" => "admin",
-//        ]);
-//        Student::factory(5000)->create();
-//        Teacher::factory(50)->create();
+        DB::table("classrooms")->truncate();
+        User::query()->create([
+            "name" => "Administrator",
+            "avatar" => "https://i.pinimg.com/736x/4d/47/59/4d4759f61e13927c5f5b39a4cc66af70.jpg",
+            "email" => 'bizsoft@live.com',
+            "password" => Hash::make("12345"),
+            "phone" => "+840904800240",
+            "birthday" => Carbon::create("2002", "1", "7"),
+            "role" => "admin",
+        ]);
+        Student::factory(5000)->create();
+        Teacher::factory(50)->create();
         Classroom::factory(20)->create();
     }
 }

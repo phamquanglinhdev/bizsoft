@@ -20,7 +20,9 @@ class Lesson extends Model
     protected $table = "lessons";
     protected $guarded = ["id"];
     protected $casts = [
-        "exercises" => 'array'
+        "exercises" => 'array',
+        'attendances' => 'array',
+        'record' => 'json'
     ];
 
     public function Classroom(): BelongsTo

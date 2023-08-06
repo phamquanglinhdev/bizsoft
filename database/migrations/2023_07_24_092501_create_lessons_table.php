@@ -21,7 +21,7 @@ return new class extends Migration {
             $table->string("end");
             $table->longText("attendances");
             $table->integer("hour_salary");
-            $table->string("record")->nullable();
+            $table->longText("record")->nullable();
             $table->longText("exercises")->nullable();
             $table->timestamps();
         });

@@ -13,6 +13,7 @@ use App\Repositories\Eloquent\LessonRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class LessonController extends Controller
 {
@@ -69,7 +70,44 @@ class LessonController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $attributes = $request->input();
+        $attributes["teacher_id"] = $request["teacher_id"] ?? $request->user()->id;
+        $validate = Validator::make($attributes, [
+            'session' => 'required',
+            'classroom_id' => 'required',
+            'title' => 'required',
+            'day' => 'required',
+            'start' => 'required',
+            'end' => 'required',
+            'attendances' => 'required',
+            'hour_salary' => 'required|numeric',
+        ], [
+            'session' => 'Kiểm tra lại buổi học',
+            'classroom_id.*' => 'Kiểm tra lại lớp học',
+            'title.*' => 'Kiểm tra lại tiêu đề',
+            'day.*' => 'Kiểm tra lại ngày học',
+            'start.*' => 'Kiểm tra lại thời gian bắt đầu',
+            'end.*' => 'Kiểm tra lại thời gian kết thúc',
+            'attendances.*' => 'Kiểm tra lại danh sách điểm danh',
+            'hour_salary.*' => 'Kiểm tra lại lương giờ học',
+        ]);
+        if ($validate->fails()) {
+            return response()->json(["message" => $validate->errors()->first()], 401);
+        }
+        if (isset($attributes["id"])) {
+            $lessonCreate = $this->lessonRepository->find($attributes["id"]);
+            $lessonCreate?->update($attributes);
+        } else {
+            try {
+                $this->lessonRepository->create($attributes);
+            } catch (\Exception $exception) {
+                return response()->json(['message' => $exception->getMessage(), "data" => $attributes], 500);
+            }
+        }
+        return response()->json([
+            "message" => "Thành công"
+        ]);
     }
 
     /**
