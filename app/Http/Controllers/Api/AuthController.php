@@ -48,7 +48,7 @@ class AuthController extends Controller
         if (!Hash::check($request["password"], $user["password"])) {
             return response([
                 "message" => "Mật khẩu không chính xác"
-            ], 401);
+            ], 404);
         }
         return response([
             'token' => 'Bearer ' . $user->createToken("Bearer")->plainTextToken,
@@ -64,7 +64,8 @@ class AuthController extends Controller
         $user = $request->user();
         return [
             'name' => $user["name"],
-            'avatar' => $user['avatar']
+            'avatar' => $user['avatar'],
+            'role' => $user["role"]
         ];
     }
 }

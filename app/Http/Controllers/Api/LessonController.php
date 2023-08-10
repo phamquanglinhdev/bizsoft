@@ -72,7 +72,7 @@ class LessonController extends Controller
     {
 
         $attributes = $request->input();
-        $attributes["teacher_id"] = $request["teacher_id"] ?? $request->user()->id;
+        $attributes["teacher_id"] = $request["teacher_id"]["value"] ?? $request->user()->id;
         $validate = Validator::make($attributes, [
             'session' => 'required',
             'classroom_id' => 'required',
@@ -115,7 +115,29 @@ class LessonController extends Controller
      */
     public function show(string $id)
     {
-        //
+        /**
+         * @var Lesson $lesson
+         */
+        $lesson = $this->lessonRepository->find($id);
+        return [
+            'session' => $lesson["session"],
+            'record' => $lesson['record'],
+            'title' => $lesson['title'],
+            'day' => $lesson['day'],
+            'start' => $lesson['start'],
+            'end' => $lesson['end'],
+            'attendances' => $lesson['attendances'],
+            'hour_salary' => $lesson['hour_salary'],
+            'asm' => $lesson['asm'],
+            'classroom' => [
+                'id' => $lesson->Classroom()->first()->id,
+                'name' => $lesson->Classroom()->first()->name,
+            ],
+            'teacher' => [
+                'id' => $lesson->Teacher()->first()->id ?? '',
+                'name' => $lesson->Teacher()->first()->name ?? 'Admin điểm danh'
+            ]
+        ];
     }
 
     /**

@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
             "birthday" => Carbon::create("2002", "1", "7"),
             "role" => "admin",
         ]);
-        Student::factory(5000)->create();
+        Student::factory(200)->create();
         Teacher::factory(50)->create();
         Classroom::factory(20)->create();
     }
