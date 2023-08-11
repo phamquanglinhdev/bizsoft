@@ -53,6 +53,7 @@ class LessonController extends Controller
                     'id' => $lesson['id'],
                     'session' => $lesson['session'],
                     'classroom' => $lesson->Classroom()->first(["id", "name"]),
+                    'teacher' => $lesson->Teacher()->first(["id", "name", "avatar"]),
                     'title' => $lesson['title'],
                     'day' => Carbon::parse($lesson['day'])->isoFormat("DD/MM/YYYY"),
                     'start' => $lesson['start'],
@@ -72,7 +73,7 @@ class LessonController extends Controller
     {
 
         $attributes = $request->input();
-        $attributes["teacher_id"] = $request["teacher_id"]["value"] ?? $request->user()->id;
+
         $validate = Validator::make($attributes, [
             'session' => 'required',
             'classroom_id' => 'required',
@@ -100,6 +101,7 @@ class LessonController extends Controller
             $lessonCreate?->update($attributes);
         } else {
             try {
+                $attributes["teacher_id"] = $request["teacher_id"]["value"] ?? $request->user()->id;
                 $this->lessonRepository->create($attributes);
             } catch (\Exception $exception) {
                 return response()->json(['message' => $exception->getMessage(), "data" => $attributes], 500);
@@ -136,7 +138,9 @@ class LessonController extends Controller
             'teacher' => [
                 'id' => $lesson->Teacher()->first()->id ?? '',
                 'name' => $lesson->Teacher()->first()->name ?? 'Admin điểm danh'
-            ]
+            ],
+            'classroom_id' => $lesson["classroom_id"],
+            'teacher_id' => $lesson['teacher_id']
         ];
     }
 
